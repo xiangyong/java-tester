@@ -1,4 +1,4 @@
-#Tue May 05 13:41:49 CST 2009
+#Fri May 08 16:26:21 CST 2009
 eclipse.preferences.version=1
 encoding//docs/test\ guide.txt=GBK
 encoding//src/main/java/org/jtester/core/IExpectation.java=UTF-8
@@ -9,6 +9,7 @@ encoding//src/main/java/org/jtester/hamcrest/iassert/common/intf/IBaseAssert.jav
 encoding//src/main/java/org/jtester/hamcrest/iassert/common/intf/IComparableAssert.java=UTF-8
 encoding//src/main/java/org/jtester/hamcrest/iassert/common/intf/IObjectContainerAssert.java=UTF-8
 encoding//src/main/java/org/jtester/hamcrest/iassert/common/intf/IReflectionAssert.java=UTF-8
+encoding//src/main/java/org/jtester/hamcrest/iassert/common/intf/ITypeAssert.java=UTF-8
 encoding//src/main/java/org/jtester/hamcrest/iassert/object/intf/IArrayAssert.java=UTF-8
 encoding//src/main/java/org/jtester/hamcrest/iassert/object/intf/IBooleanAssert.java=UTF-8
 encoding//src/main/java/org/jtester/hamcrest/iassert/object/intf/IByteAssert.java=UTF-8
@@ -28,6 +29,10 @@ encoding//src/main/java/org/jtester/hamcrest/iassert/object/intf/IStringAssert.j
 encoding//src/main/java/org/jtester/jmock/ExpectationsUtil.java=UTF-8
 encoding//src/main/java/org/jtester/jmock/ICallMethod.java=UTF-8
 encoding//src/main/java/org/jtester/jmock/JTesterExpectations.java=UTF-8
+encoding//src/main/java/org/jtester/unitils/dbwiki/MultiSchemaWikilDataSetReader.java=UTF-8
+encoding//src/main/java/org/jtester/unitils/dbwiki/WikiDataSet.java=UTF-8
+encoding//src/main/java/org/jtester/unitils/dbwiki/WikiParser.java=UTF-8
+encoding//src/main/java/org/jtester/unitils/dbwiki/WikiPaserUtil.java=UTF-8
 encoding//src/main/java/org/jtester/utility/ArrayConvertor.java=UTF-8
 encoding//src/main/java/org/jtester/utility/ArrayUtil.java=UTF-8
 encoding//src/main/java/org/jtester/utility/FindClazUtil.java=UTF-8
@@ -35,6 +40,7 @@ encoding//src/main/java/org/jtester/utility/FindMethodUtil.java=UTF-8
 encoding//src/main/java/org/jtester/utility/PrimitiveConvertor.java=UTF-8
 encoding//src/main/java/org/jtester/utility/ReflectUtil.java=UTF-8
 encoding//src/main/java/org/jtester/utility/SerializeUtil.java=UTF-8
+encoding//src/test/java/org/jtester/dbtest/service/BaseService.java=UTF-8
 encoding//src/test/java/org/jtester/dbtest/service/UserServiceTest_ByInjectedMock.java=UTF-8
 encoding//src/test/java/org/jtester/dbtest/service/UserServiceTest_Mock1.java=UTF-8
 encoding//src/test/java/org/jtester/dbtest/service/UserServiceTest_Mock2.java=UTF-8

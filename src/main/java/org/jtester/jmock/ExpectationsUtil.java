@@ -1,9 +1,10 @@
 package org.jtester.jmock;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jmock.Expectations;
+import org.jtester.exception.JTesterException;
 
 /**
  * 用于注册或获取当前线程下当前使用的org.jmock.Expectations实例<br>
@@ -14,7 +15,7 @@ import org.jmock.Expectations;
  * 
  */
 public class ExpectationsUtil {
-	private static Map<Long, Expectations> jes = new HashMap<Long, Expectations>();
+	private static Map<Long, Expectations> jes = new ConcurrentHashMap<Long, Expectations>();
 
 	/**
 	 * 注册当前线程下当前使用的org.jmock.Expectations实例
@@ -34,7 +35,7 @@ public class ExpectationsUtil {
 	public static Expectations getExpectations(long id) {
 		Expectations ex = jes.get(id);
 		if (ex == null) {
-			throw new RuntimeException("no expectation has been defined by Thread");
+			throw new JTesterException("no expectation has been defined by Thread");
 		}
 		return ex;
 	}

@@ -2,6 +2,13 @@ package org.jtester.utility;
 
 import java.lang.reflect.Field;
 
+import ognl.DefaultMemberAccess;
+import ognl.Ognl;
+import ognl.OgnlContext;
+import ognl.OgnlException;
+
+import org.jtester.exception.JTesterException;
+
 /**
  * POJO反射处理工具类
  * 
@@ -20,19 +27,17 @@ public class ReflectUtil {
 	 * @throws SecurityException
 	 * @throws NoSuchFieldException
 	 */
-	public static void setFieldValue(Object obj, String fieldName, Object value) throws SecurityException,
-			NoSuchFieldException {
+	public static void setFieldValue(Object obj, String fieldName, Object value) {
 		assert obj != null : "the obj can't be null";
-
-		Field field = obj.getClass().getDeclaredField(fieldName);
-		boolean accessible = field.isAccessible();
 		try {
+			Field field = obj.getClass().getDeclaredField(fieldName);
+			boolean accessible = field.isAccessible();
 			field.setAccessible(true);
 			field.set(obj, value);
-		} catch (Exception e) {
-			throw new RuntimeException("Unable to update the value in field[" + field.getName() + "]", e);
-		} finally {
 			field.setAccessible(accessible);
+		} catch (Exception e) {
+			String error = "Unable to update the value in field[" + fieldName + "]";
+			throw new JTesterException(error, e);
 		}
 	}
 
@@ -45,7 +50,7 @@ public class ReflectUtil {
 	 * @throws SecurityException
 	 * @throws NoSuchFieldException
 	 */
-	public static Object getFieldValue(Object obj, String fieldName) throws SecurityException, NoSuchFieldException {
+	public static Object getFieldValue(Object obj, String fieldName) {
 		assert obj != null : "the obj can't be null";
 		return getFieldValue(obj.getClass(), obj, fieldName);
 	}
@@ -60,18 +65,34 @@ public class ReflectUtil {
 	 * @throws SecurityException
 	 * @throws NoSuchFieldException
 	 */
-	public static Object getFieldValue(Class<?> claz, Object obj, String fieldName) throws SecurityException,
-			NoSuchFieldException {
+	public static Object getFieldValue(Class<?> claz, Object obj, String fieldName) {
 		assert obj != null : "the obj can't be null";
-		Field field = claz.getDeclaredField(fieldName);
+		Field field = null;
+		try {
+			field = claz.getDeclaredField(fieldName);
+		} catch (Exception e) {
+			throw new JTesterException(e);
+		}
 		boolean accessible = field.isAccessible();
 		try {
 			field.setAccessible(true);
-			return field.get(obj);
+			Object o = field.get(obj);
+			return o;
 		} catch (Exception e) {
-			throw new RuntimeException("Unable to get the value in field[" + field.getName() + "]", e);
+			throw new JTesterException("Unable to get the value in field[" + fieldName + "]", e);
 		} finally {
 			field.setAccessible(accessible);
+		}
+	}
+
+	public static Object getPropertyValue(Object object, String ognlExpression) {
+		try {
+			OgnlContext ognlContext = new OgnlContext();
+			ognlContext.setMemberAccess(new DefaultMemberAccess(true));
+			Object ognlExprObj = Ognl.parseExpression(ognlExpression);
+			return Ognl.getValue(ognlExprObj, ognlContext, object);
+		} catch (OgnlException e) {
+			throw new JTesterException("Failed to get property value using OGNL expression " + ognlExpression, e);
 		}
 	}
 }

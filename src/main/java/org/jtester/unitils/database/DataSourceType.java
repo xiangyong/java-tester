@@ -117,15 +117,13 @@ public enum DataSourceType {
 	}
 
 	public static DataSourceType type() {
-		String type = ConfigUtil.dataSource();
-		DataSourceType dataSourceType = DataSourceType.H2DB;
 		try {
-			dataSourceType = DataSourceType.valueOf(type.toUpperCase());
+			String type = ConfigUtil.dataSourceType();
+			return DataSourceType.valueOf(type.toUpperCase());
 		} catch (Exception e) {
 			log.warn(e.getMessage());
-			dataSourceType = DataSourceType.H2DB;
+			return null;
 		}
-		return dataSourceType;
 	}
 
 	public boolean autoExport() {

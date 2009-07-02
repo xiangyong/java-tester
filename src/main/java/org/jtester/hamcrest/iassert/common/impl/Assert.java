@@ -5,6 +5,7 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
 import org.jmock.Expectations;
+import org.jtester.exception.JTesterException;
 import org.jtester.hamcrest.iassert.common.intf.IAssert;
 import org.jtester.hamcrest.matcher.LinkMatcher;
 import org.jtester.jmock.ExpectationsUtil;
@@ -14,17 +15,29 @@ public abstract class Assert<T, E extends IAssert<T, ?>> extends BaseMatcher<T> 
 
 	protected Class<?> valueClaz = null;
 
-	protected T value;
+	protected Object value;
 
 	protected AssertType type;
 
 	@SuppressWarnings("unchecked")
 	protected Class<? extends IAssert> assertClaz;
 
-	protected LinkMatcher<T> link;
+	protected LinkMatcher<?> link;
 
 	public Assert() {
 	}
+
+	// public <F extends Assert<?, ?>> F convert(Class<F> claz) throws
+	// InstantiationException, IllegalAccessException {
+	// F instance = claz.newInstance();
+	// instance.valueClaz = this.valueClaz;
+	// instance.value = this.value;
+	// instance.type = this.type;
+	// instance.link = this.link;
+	//
+	// instance.assertClaz = claz;
+	// return instance;
+	// }
 
 	public Assert(Class<? extends IAssert<?, ?>> clazE) {
 		this.value = null;
@@ -48,7 +61,11 @@ public abstract class Assert<T, E extends IAssert<T, ?>> extends BaseMatcher<T> 
 	}
 
 	public void describeTo(Description description) {
-		link.describeTo(description);
+		if (link != null && this.type == AssertType.Expectations) {
+			link.describeTo(description);
+		} else if (this.value != null) {
+			description.appendText(this.value.toString());
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -71,6 +88,11 @@ public abstract class Assert<T, E extends IAssert<T, ?>> extends BaseMatcher<T> 
 		return (E) this;
 	}
 
+	@Override
+	public String toString() {
+		return this.getClass().getName();
+	}
+
 	public boolean matches(Object item) {
 		return this.link.matches(item);
 	}
@@ -81,17 +103,28 @@ public abstract class Assert<T, E extends IAssert<T, ?>> extends BaseMatcher<T> 
 
 	@Override
 	public boolean equals(Object obj) {
-		throw new RuntimeException("the method can't be used,please use isEqualTo() instead");
+		throw new JTesterException("the method can't be used,please use isEqualTo() instead");
 	}
 
 	@SuppressWarnings("unchecked")
 	public T wanted() {
 		if (this.type == AssertType.AssertThat) {
-			throw new RuntimeException("is not an Expectations");
+			throw new JTesterException("is not an Expectations");
 		} else {
 			Expectations ex = ExpectationsUtil.getExpectations(Thread.currentThread().getId());
 			ex.with(this.link);
 			return (T) PrimitiveConvertor.value(valueClaz);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public <F> F wanted(Class<F> claz) {
+		if (this.type == AssertType.AssertThat) {
+			throw new JTesterException("is not an Expectations");
+		} else {
+			Expectations ex = ExpectationsUtil.getExpectations(Thread.currentThread().getId());
+			ex.with(this.link);
+			return (F) PrimitiveConvertor.value(claz);
 		}
 	}
 }

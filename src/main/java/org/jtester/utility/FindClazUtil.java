@@ -11,6 +11,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import org.jtester.exception.JTesterException;
+
 /**
  * 
  * @author darui.wudr
@@ -202,7 +204,7 @@ public class FindClazUtil {
 			return clazzes;
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new RuntimeException(e);
+			throw new JTesterException(e);
 		}
 	}
 
@@ -215,5 +217,16 @@ public class FindClazUtil {
 	public static List<String> findClazz(Class<?> claz) {
 		String pack = claz.getPackage().getName();
 		return FindClazUtil.findClazz(pack);
+	}
+
+	/**
+	 * 获得class的package路径
+	 * 
+	 * @param claz
+	 * @return
+	 */
+	public static String finePackageDir(Class<?> claz) {
+		String pack = claz.getPackage().getName();
+		return pack.replaceAll("\\.", "/");
 	}
 }

@@ -4,10 +4,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+
+import org.jtester.exception.JTesterException;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -35,10 +36,8 @@ public class SerializeUtil {
 			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename));
 			out.writeObject(o);
 			out.close();
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		} catch (Exception e) {
+			throw new JTesterException(e);
 		}
 	}
 
@@ -58,10 +57,8 @@ public class SerializeUtil {
 			FileOutputStream fos = new FileOutputStream(filename);
 			xs.toXML(o, fos);
 			fos.close();
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		} catch (Exception e) {
+			throw new JTesterException(e);
 		}
 	}
 
@@ -83,12 +80,8 @@ public class SerializeUtil {
 			Object obj = in.readObject();
 			in.close();
 			return (T) obj;
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(e);
+		} catch (Exception e) {
+			throw new JTesterException(e);
 		}
 	}
 
@@ -107,25 +100,48 @@ public class SerializeUtil {
 		try {
 			InputStream fis = SerializeUtil.isFileExisted(filename);
 			if (fis == null) {
-				throw new RuntimeException(String.format("file '%s' doesn't exist", filename));
+				throw new JTesterException(String.format("file '%s' doesn't exist", filename));
 			}
 			XStream xs = new XStream(new DomDriver());
 			// XStream xs = new XStream();
 			Object o = xs.fromXML(fis);
 			return (T) o;
 		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
+			throw new JTesterException(e);
 		}
 	}
 
 	private static InputStream isFileExisted(String filename) throws FileNotFoundException {
 		if (filename.startsWith("classpath:")) {
 			String file = filename.replaceFirst("classpath:", "");
-			return ClassLoader.getSystemResourceAsStream(file);
+
+			InputStream stream = null;
+			try {
+				stream = ClassLoader.getSystemResourceAsStream(file);
+			} catch (Throwable e) {
+				stream = null;
+			}
+			if (stream == null) {
+				StackTraceElement[] traces = Thread.currentThread().getStackTrace();
+				boolean calledFromXML = false;
+				for (StackTraceElement trace : traces) {
+					if (trace.getMethodName().equalsIgnoreCase("fromXML")
+							&& trace.getClassName().equalsIgnoreCase("org.jtester.utility.SerializeUtil")) {
+						calledFromXML = true;
+					}
+					if (calledFromXML) {
+						file = ClazzUtil.getPathFromPath(trace.getClassName()) + File.separatorChar + file;
+						stream = ClassLoader.getSystemResourceAsStream(file);
+						break;
+					}
+				}
+			}
+			return stream;
+
 		} else {
 			File file = new File(filename);
 			if (!file.exists()) {
-				throw new RuntimeException("object serializable file doesn't exist");
+				throw new JTesterException("object serializable file doesn't exist");
 			}
 			return new FileInputStream(file);
 		}
